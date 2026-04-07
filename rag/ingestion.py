@@ -31,10 +31,16 @@ def load_documents(path):
 
 
 def split_documents(documents):
+    """
+    Split documents into chunks with improved strategy
+    - Larger chunks for better context
+    - More overlap to preserve continuity
+    """
     from langchain_text_splitters import CharacterTextSplitter
     splitter = CharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
+        chunk_size=1000,      # Increased from 500 for better context
+        chunk_overlap=200,    # Increased from 50 for better continuity
+        separator="\n\n"      # Split on paragraphs first
     )
     return splitter.split_documents(documents)
 

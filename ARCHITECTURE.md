@@ -12,13 +12,13 @@
 
 ## System Overview
 
-यह एक **Retrieval-Augmented Generation (RAG)** system है जो documents से intelligent answers generate करता है।
+This is a **Retrieval-Augmented Generation (RAG)** system that generates intelligent answers from documents.
 
 ### Key Features:
-- Document ingestion और processing
+- Document ingestion and processing
 - Vector-based semantic search
 - AI-powered answer generation
-- Web और CLI interfaces
+- Web and CLI interfaces
 - Production-ready deployment
 
 ---
@@ -210,12 +210,12 @@ VECTOR_DB_PATH    # vectorstore/db/
 │                                              │
 │  1. Load Documents                           │
 │     ├─ Read .txt files                       │
-│     └─ TextLoader (LangChain)                │
+│     └─ Custom TextLoader                     │
 │                                              │
 │  2. Split Documents                          │
-│     ├─ CharacterTextSplitter                 │
-│     ├─ chunk_size: 500                       │
-│     └─ chunk_overlap: 50                     │
+│     ├─ Custom CharacterTextSplitter          │
+│     ├─ chunk_size: 1000                      │
+│     └─ chunk_overlap: 200                    │
 │                                              │
 │  3. Create Embeddings                        │
 │     ├─ MockEmbeddings (1536 dim)             │
@@ -263,11 +263,11 @@ Documents → Load → Split → Embed → FAISS → Save
 
 **Key Functions:**
 - `load_db(path)` - Load FAISS index
-- `retrieve(query, k=3)` - Get top-k similar documents
+- `retrieve(query, k=5)` - Get top-k similar documents
 
 **Similarity Search:**
-- Uses cosine similarity
-- Returns top 3 most relevant chunks
+- Uses L2 distance (FAISS)
+- Returns top 5 most relevant chunks
 - Includes metadata and content
 
 ---
@@ -458,10 +458,9 @@ stateDiagram-v2
 ├─────────────────────────────────────────────┤
 │                                             │
 │  Language:                                  │
-│    • Python 3.10                            │
+│    • Python 3.11                            │
 │                                             │
 │  Frameworks:                                │
-│    • LangChain (Document processing)        │
 │    • Streamlit (Web UI)                     │
 │                                             │
 │  Vector Database:                           │
@@ -472,11 +471,12 @@ stateDiagram-v2
 │    • Model: Llama 3.3 70B Versatile         │
 │                                             │
 │  Libraries:                                 │
-│    • langchain-community                    │
-│    • langchain-text-splitters               │
 │    • openai (SDK)                           │
 │    • numpy                                  │
 │    • python-dotenv                          │
+│    • requests                               │
+│    • beautifulsoup4                         │
+│    • faiss-cpu                              │
 │                                             │
 │  Deployment:                                │
 │    • Docker                                 │

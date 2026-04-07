@@ -53,7 +53,6 @@ Open: http://localhost:8501
 
 ## Documentation
 
-- **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup guide
 - **[Architecture Guide](ARCHITECTURE.md)** - Complete system architecture, diagrams, and technical details
 
 ## Architecture Overview
@@ -115,8 +114,8 @@ RAG-AIML/
 
 ## Technology Stack
 
-- **Language**: Python 3.10
-- **Framework**: LangChain, Streamlit
+- **Language**: Python 3.11
+- **Framework**: Streamlit
 - **Vector DB**: FAISS
 - **LLM**: Groq (Llama 3.3 70B)
 - **Deployment**: Docker, Streamlit Cloud

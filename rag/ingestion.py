@@ -10,16 +10,31 @@ class MockEmbeddings(Embeddings):
     """Mock embeddings for testing without OpenAI API"""
     def __init__(self, embedding_dim: int = 1536):
         self.embedding_dim = embedding_dim
+        self._cache = {}  # Cache for consistent embeddings
+
+    def _get_embedding(self, text: str):
+        """Generate consistent embedding for a given text"""
+        # Use hash of text as seed for consistency
+        import hashlib
+        text_hash = int(hashlib.md5(text.encode()).hexdigest(), 16)
+        np.random.seed(text_hash % (2**32))  # Use hash as seed
+        embedding = np.random.randn(self.embedding_dim).tolist()
+        return embedding
 
     def embed_documents(self, texts):
         """Create consistent mock embeddings for documents"""
-        np.random.seed(42)  # For reproducibility
-        return [np.random.randn(self.embedding_dim).tolist() for _ in texts]
+        embeddings = []
+        for text in texts:
+            if text not in self._cache:
+                self._cache[text] = self._get_embedding(text)
+            embeddings.append(self._cache[text])
+        return embeddings
 
     def embed_query(self, text: str):
         """Create consistent mock embeddings for query"""
-        np.random.seed(42)
-        return np.random.randn(self.embedding_dim).tolist()
+        if text not in self._cache:
+            self._cache[text] = self._get_embedding(text)
+        return self._cache[text]
 
 def load_documents(path):
     docs = []

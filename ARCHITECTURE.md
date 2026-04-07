@@ -1,6 +1,6 @@
 # RAG System - Architecture Documentation
 
-## 📋 Table of Contents
+## Table of Contents
 1. [System Overview](#system-overview)
 2. [Architecture Diagram](#architecture-diagram)
 3. [Component Details](#component-details)
@@ -10,7 +10,7 @@
 
 ---
 
-## 🎯 System Overview
+## System Overview
 
 यह एक **Retrieval-Augmented Generation (RAG)** system है जो documents से intelligent answers generate करता है।
 
@@ -23,7 +23,7 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 ### High-Level Architecture
 
@@ -75,7 +75,7 @@
 
 ---
 
-## 📦 Component Details
+## Component Details
 
 ### 1. Configuration Layer (`app/config.py`)
 
@@ -252,7 +252,7 @@ def rag_pipeline(query):
 
 ---
 
-## 🔄 Data Flow
+## Data Flow
 
 ### Complete Request Flow
 
@@ -309,7 +309,7 @@ def rag_pipeline(query):
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Core Technologies
 
@@ -349,7 +349,7 @@ def rag_pipeline(query):
 
 ---
 
-## 🔌 API Integration
+## API Integration
 
 ### Groq API Integration
 
@@ -392,7 +392,7 @@ def rag_pipeline(query):
 
 ---
 
-## 📊 System Metrics
+## System Metrics
 
 ### Performance Characteristics
 
@@ -425,7 +425,7 @@ def rag_pipeline(query):
 
 ---
 
-## 🔐 Security Architecture
+## Security Architecture
 
 ```
 ┌────────────────────────────────────────┐
@@ -455,7 +455,7 @@ def rag_pipeline(query):
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
 ```
 RAG-AIML/
@@ -492,7 +492,7 @@ RAG-AIML/
 
 ---
 
-## 🚀 Deployment Architecture
+## Deployment Architecture
 
 ### Production Deployment
 
@@ -528,7 +528,7 @@ RAG-AIML/
 
 ---
 
-## 🔍 Troubleshooting Guide
+## Troubleshooting Guide
 
 ### Common Issues & Solutions
 
@@ -551,7 +551,7 @@ Solution: export KMP_DUPLICATE_LIB_OK=TRUE
 
 ---
 
-## 📈 Future Enhancements
+## Future Enhancements
 
 1. **Multi-format Support**: PDF, DOCX, HTML
 2. **Advanced Embeddings**: OpenAI, Cohere embeddings
@@ -564,7 +564,7 @@ Solution: export KMP_DUPLICATE_LIB_OK=TRUE
 
 ---
 
-## 📞 Support & Maintenance
+## Support & Maintenance
 
 - **Logs**: Check application logs for errors
 - **Monitoring**: Track API usage and costs

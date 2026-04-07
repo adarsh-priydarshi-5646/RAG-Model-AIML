@@ -1,4 +1,4 @@
-# RAG System with Groq API 🤖
+# RAG System with Groq API
 
 A production-ready Retrieval-Augmented Generation (RAG) system using LangChain, FAISS, and Groq's free API.
 
@@ -6,16 +6,16 @@ A production-ready Retrieval-Augmented Generation (RAG) system using LangChain, 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 
-## ✨ Features
+## Features
 
-- 📚 Document ingestion and intelligent chunking
-- 🔍 Vector-based semantic search with FAISS
-- 🤖 AI-powered answers using Groq's Llama 3.3 70B
-- 💬 Interactive web interface (Streamlit)
-- 🚀 Production-ready with Docker support
-- 🆓 Completely free to use
+- Document ingestion and intelligent chunking
+- Vector-based semantic search with FAISS
+- AI-powered answers using Groq's Llama 3.3 70B
+- Interactive web interface (Streamlit)
+- Production-ready with Docker support
+- Completely free to use
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone & Install
 ```bash
@@ -49,12 +49,12 @@ Open: http://localhost:8501
 ./run.sh
 ```
 
-## 📖 Documentation
+## Documentation
 
 - **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup guide
 - **[Architecture Guide](ARCHITECTURE.md)** - Complete system architecture, diagrams, and technical details
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ```
 User Query → Retriever (FAISS) → Generator (Groq LLM) → Answer
@@ -66,7 +66,7 @@ User Query → Retriever (FAISS) → Generator (Groq LLM) → Answer
 
 For detailed architecture diagrams and flow, see [ARCHITECTURE.md](ARCHITECTURE.md)
 
-## 🌐 Deployment
+## Deployment
 
 ### Streamlit Cloud (Recommended - FREE)
 1. Push to GitHub ✅
@@ -85,7 +85,7 @@ docker-compose up -d
 - Hugging Face Spaces
 - Railway ($5/month)
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 RAG-AIML/
@@ -101,7 +101,7 @@ RAG-AIML/
 └── ingest.py         # Ingestion script
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Language**: Python 3.10
 - **Framework**: LangChain, Streamlit
@@ -109,14 +109,14 @@ RAG-AIML/
 - **LLM**: Groq (Llama 3.3 70B)
 - **Deployment**: Docker, Streamlit Cloud
 
-## 🔧 API Configuration
+## API Configuration
 
 - **Provider**: Groq
 - **Base URL**: `https://api.groq.com/openai/v1`
 - **Model**: `llama-3.3-70b-versatile`
 - **Cost**: FREE tier available
 
-## 📝 Usage Example
+## Usage Example
 
 ```python
 from rag.pipeline import rag_pipeline
@@ -125,22 +125,22 @@ answer = rag_pipeline("Who created Python?")
 print(answer)  # Output: Guido van Rossum
 ```
 
-## 🎯 How It Works
+## How It Works
 
 1. **Ingestion**: Documents are loaded, split into chunks, and stored in FAISS vector database
 2. **Retrieval**: User query is embedded and similar chunks are retrieved
 3. **Generation**: Retrieved context + query is sent to Groq LLM
 4. **Response**: AI generates answer based only on document context
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Please open an issue or submit a PR.
 
-## 📄 License
+## License
 
 MIT License
 
-## 👨‍💻 Author
+## Author
 
 Adarsh Priydarshi
 - GitHub: [@adarsh-priydarshi-5646](https://github.com/adarsh-priydarshi-5646)

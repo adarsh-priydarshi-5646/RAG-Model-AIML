@@ -11,7 +11,7 @@ def load_db(path):
 
 def retrieve(query, k=3):
     """
-    Retrieve relevant documents for a query
+    Retrieve relevant documents for a query with improved search
     
     Args:
         query: User's question
@@ -23,10 +23,24 @@ def retrieve(query, k=3):
     try:
         db = load_db(VECTOR_DB_PATH)
         
-        # Use similarity search with score to get most relevant docs
-        results = db.similarity_search(query, k=k)
+        # Get more results initially for better coverage
+        initial_k = min(k * 2, 10)  # Get double but cap at 10
         
-        # If no results, try with more relaxed search
+        # Use similarity search with score
+        results_with_scores = db.similarity_search_with_score(query, k=initial_k)
+        
+        # Filter by relevance score if available
+        if results_with_scores:
+            # Sort by score (lower is better for FAISS)
+            results_with_scores.sort(key=lambda x: x[1])
+            
+            # Take top k results
+            results = [doc for doc, score in results_with_scores[:k]]
+        else:
+            # Fallback to regular search
+            results = db.similarity_search(query, k=k)
+        
+        # If still no results, try with relaxed search
         if not results:
             results = db.similarity_search(query, k=k*2)
         

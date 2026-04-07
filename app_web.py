@@ -13,7 +13,7 @@ from rag.retriever import retrieve
 # Page config
 st.set_page_config(
     page_title="RAG Q&A System",
-    page_icon="🤖",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -98,12 +98,12 @@ if "show_sources" not in st.session_state:
 # Header
 col1, col2 = st.columns([3, 1])
 with col1:
-    st.title("🤖 RAG Question Answering System")
+    st.title("RAG Question Answering System")
     st.markdown('<p class="subtitle">Ask questions about your documents and get AI-powered answers</p>', unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
-    st.header("⚙️ Settings")
+    st.header("Settings")
     
     # Show sources toggle
     st.session_state.show_sources = st.checkbox(
@@ -124,31 +124,31 @@ with st.sidebar:
     st.markdown("---")
     
     # System info
-    st.header("📊 System Info")
+    st.header("System Info")
     
     # Check if vector DB exists
     import os
     db_exists = os.path.exists("vectorstore/db/index.faiss")
     
     if db_exists:
-        st.success("✅ Vector Database: Ready")
+        st.success("Vector Database: Ready")
         
         # Count documents
         try:
             from rag.ingestion import load_documents
             from app.config import DATA_PATH
             docs = load_documents(DATA_PATH)
-            st.info(f"📚 Documents loaded: {len(docs)}")
+            st.info(f"Documents loaded: {len(docs)}")
         except:
-            st.info("📚 Documents: Available")
+            st.info("Documents: Available")
     else:
-        st.error("❌ Vector Database: Not found")
-        st.warning("Run: `python ingest.py`")
+        st.error("Vector Database: Not found")
+        st.warning("Run: python ingest.py")
     
     st.markdown("---")
     
     # Model info
-    st.header("🔧 Model Info")
+    st.header("Model Info")
     st.markdown("""
     - **Provider**: Groq
     - **Model**: Llama 3.3 70B
@@ -159,14 +159,14 @@ with st.sidebar:
     st.markdown("---")
     
     # Clear chat button
-    if st.button("🗑️ Clear Chat History", use_container_width=True):
+    if st.button("Clear Chat History", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
     
     st.markdown("---")
     
     # Example questions
-    st.header("💡 Example Questions")
+    st.header("Example Questions")
     example_questions = [
         "Who created Python?",
         "What are the key features?",
@@ -185,19 +185,18 @@ chat_container = st.container()
 # Display chat history
 with chat_container:
     for message in st.session_state.messages:
-        role_emoji = "👤" if message["role"] == "user" else "🤖"
         role_name = "You" if message["role"] == "user" else "Assistant"
         
         st.markdown(f"""
         <div class="chat-message {message['role']}">
-            <div class="role">{role_emoji} {role_name}</div>
+            <div class="role">{role_name}</div>
             <div class="message">{message['content']}</div>
         </div>
         """, unsafe_allow_html=True)
         
         # Show sources if available
         if message["role"] == "assistant" and "sources" in message and st.session_state.show_sources:
-            with st.expander("📄 View Source Documents", expanded=False):
+            with st.expander("View Source Documents", expanded=False):
                 for i, source in enumerate(message["sources"], 1):
                     st.markdown(f"""
                     <div class="source-doc">
@@ -214,13 +213,13 @@ if prompt := st.chat_input("Ask a question about your documents..."):
     # Display user message immediately
     st.markdown(f"""
     <div class="chat-message user">
-        <div class="role">👤 You</div>
+        <div class="role">You</div>
         <div class="message">{prompt}</div>
     </div>
     """, unsafe_allow_html=True)
     
     # Generate response
-    with st.spinner("🔍 Searching documents and generating answer..."):
+    with st.spinner("Searching documents and generating answer..."):
         try:
             # Retrieve documents
             docs = retrieve(prompt, k=num_sources)
@@ -241,7 +240,7 @@ if prompt := st.chat_input("Ask a question about your documents..."):
             st.rerun()
             
         except Exception as e:
-            error_msg = f"❌ Error: {str(e)}"
+            error_msg = f"Error: {str(e)}"
             st.error(error_msg)
             st.session_state.messages.append({
                 "role": "assistant", 
@@ -252,9 +251,9 @@ if prompt := st.chat_input("Ask a question about your documents..."):
 st.markdown("---")
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown("🔒 **Secure** - Your data stays private")
+    st.markdown("**Secure** - Your data stays private")
 with col2:
-    st.markdown("⚡ **Fast** - Powered by Groq")
+    st.markdown("**Fast** - Powered by Groq")
 with col3:
-    st.markdown("🆓 **Free** - No cost to use")
+    st.markdown("**Free** - No cost to use")
 

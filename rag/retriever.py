@@ -1,48 +1,43 @@
-from langchain_community.vectorstores import FAISS
-from rag.ingestion import MockEmbeddings
 from app.config import VECTOR_DB_PATH
+import numpy as np
+import faiss
+import pickle
+import os
 
 def load_db(path):
     """Load the FAISS vector database"""
-    embeddings = MockEmbeddings()
-    db = FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
-    return db
+    index = faiss.read_index(os.path.join(path, "index.faiss"))
+    
+    with open(os.path.join(path, "index.pkl"), 'rb') as f:
+        data = pickle.load(f)
+    
+    return index, data['documents'], data['embeddings_model']
 
 
-def retrieve(query, k=3):
+def retrieve(query, k=5):
     """
     Retrieve relevant documents for a query with improved search
     
     Args:
         query: User's question
-        k: Number of documents to retrieve (default: 3)
+        k: Number of documents to retrieve (default: 5)
     
     Returns:
         List of relevant document chunks
     """
     try:
-        db = load_db(VECTOR_DB_PATH)
+        index, documents, embeddings_model = load_db(VECTOR_DB_PATH)
         
-        # Get more results initially for better coverage
-        initial_k = min(k * 2, 10)  # Get double but cap at 10
+        # Embed the query
+        query_embedding = embeddings_model.embed_query(query)
+        query_embedding = np.array([query_embedding], dtype='float32')
         
-        # Use similarity search with score
-        results_with_scores = db.similarity_search_with_score(query, k=initial_k)
+        # Search in FAISS index
+        k = min(k, len(documents))  # Don't request more than available
+        distances, indices = index.search(query_embedding, k)
         
-        # Filter by relevance score if available
-        if results_with_scores:
-            # Sort by score (lower is better for FAISS)
-            results_with_scores.sort(key=lambda x: x[1])
-            
-            # Take top k results
-            results = [doc for doc, score in results_with_scores[:k]]
-        else:
-            # Fallback to regular search
-            results = db.similarity_search(query, k=k)
-        
-        # If still no results, try with relaxed search
-        if not results:
-            results = db.similarity_search(query, k=k*2)
+        # Get the documents
+        results = [documents[i] for i in indices[0] if i < len(documents)]
         
         return results
     except Exception as e:

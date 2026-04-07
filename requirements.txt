@@ -6,3 +6,5 @@ faiss-cpu==1.13.2
 numpy<2.0.0,>=1.19.3
 python-dotenv==1.0.0
 streamlit>=1.32.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0

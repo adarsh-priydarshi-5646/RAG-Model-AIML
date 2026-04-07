@@ -27,50 +27,146 @@
 
 ### High-Level Architecture
 
+```mermaid
+graph TB
+    subgraph "User Interface Layer"
+        A[Web Interface<br/>Streamlit] 
+        B[CLI Interface<br/>Terminal]
+    end
+    
+    subgraph "RAG Pipeline"
+        C[RAG Pipeline<br/>Orchestrator]
+        D[Retriever<br/>Semantic Search]
+        E[Generator<br/>LLM Response]
+    end
+    
+    subgraph "Data Layer"
+        F[Vector Database<br/>FAISS]
+        G[Documents<br/>data/raw/]
+    end
+    
+    subgraph "External Services"
+        H[Groq API<br/>Llama 3.3 70B]
+        I[Web Search<br/>DuckDuckGo/Google]
+    end
+    
+    subgraph "Ingestion Pipeline"
+        J[Document Loader]
+        K[Text Splitter]
+        L[Embeddings<br/>MockEmbeddings]
+    end
+    
+    A --> C
+    B --> C
+    C --> D
+    C --> E
+    D --> F
+    E --> H
+    E --> I
+    G --> J
+    J --> K
+    K --> L
+    L --> F
+    
+    style A fill:#2196F3,color:#fff
+    style B fill:#2196F3,color:#fff
+    style C fill:#4CAF50,color:#fff
+    style D fill:#4CAF50,color:#fff
+    style E fill:#4CAF50,color:#fff
+    style F fill:#FF9800,color:#fff
+    style G fill:#FF9800,color:#fff
+    style H fill:#9C27B0,color:#fff
+    style I fill:#9C27B0,color:#fff
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER INTERFACE                          │
-│  ┌──────────────────────┐      ┌──────────────────────┐        │
-│  │   Web Interface      │      │   CLI Interface      │        │
-│  │   (Streamlit)        │      │   (Terminal)         │        │
-│  └──────────┬───────────┘      └──────────┬───────────┘        │
-└─────────────┼──────────────────────────────┼──────────────────┘
-              │                              │
-              └──────────────┬───────────────┘
-                             │
-                             ▼
-              ┌──────────────────────────┐
-              │    RAG PIPELINE          │
-              │  (rag/pipeline.py)       │
-              └──────────┬───────────────┘
-                         │
-         ┌───────────────┴───────────────┐
-         │                               │
-         ▼                               ▼
-┌─────────────────┐            ┌─────────────────┐
-│   RETRIEVER     │            │   GENERATOR     │
-│ (retriever.py)  │            │ (generator.py)  │
-└────────┬────────┘            └────────┬────────┘
-         │                              │
-         ▼                              ▼
-┌─────────────────┐            ┌─────────────────┐
-│  VECTOR DB      │            │   GROQ API      │
-│  (FAISS)        │            │ (Llama 3.3 70B) │
-└─────────────────┘            └─────────────────┘
-         ▲
-         │
-         │ (Ingestion Phase)
-         │
-┌─────────────────┐
-│   INGESTION     │
-│ (ingestion.py)  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│   DOCUMENTS     │
-│  (data/raw/)    │
-└─────────────────┘
+
+### Data Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as Web/CLI Interface
+    participant Pipeline as RAG Pipeline
+    participant Retriever
+    participant VectorDB as FAISS Vector DB
+    participant Generator
+    participant LLM as Groq LLM
+    participant WebSearch as Web Search API
+    
+    User->>UI: Ask Question
+    UI->>Pipeline: Forward Query
+    Pipeline->>Retriever: Retrieve Documents
+    Retriever->>VectorDB: Similarity Search
+    VectorDB-->>Retriever: Top-K Documents
+    Retriever-->>Pipeline: Retrieved Docs
+    Pipeline->>Generator: Generate Answer
+    Generator->>LLM: Query + Context
+    LLM-->>Generator: Initial Response
+    
+    alt Answer Found in Documents
+        Generator-->>Pipeline: Return Answer
+    else Answer Not Found
+        Generator->>WebSearch: Search Query
+        WebSearch-->>Generator: Search Results
+        Generator->>LLM: Query + Docs + Web Results
+        LLM-->>Generator: Enhanced Answer
+        Generator-->>Pipeline: Return Answer with Sources
+    end
+    
+    Pipeline-->>UI: Final Answer
+    UI-->>User: Display Answer
+```
+
+### Ingestion Flow
+
+```mermaid
+flowchart LR
+    A[Raw Documents<br/>.txt files] --> B[Document Loader<br/>TextLoader]
+    B --> C[Text Splitter<br/>CharacterTextSplitter]
+    C --> D{Chunking Strategy}
+    D -->|chunk_size: 1000| E[Document Chunks]
+    D -->|overlap: 200| E
+    E --> F[Mock Embeddings<br/>1536 dimensions]
+    F --> G[FAISS Index<br/>Creation]
+    G --> H[Save to Disk<br/>index.faiss + index.pkl]
+    
+    style A fill:#FFC107,color:#000
+    style H fill:#4CAF50,color:#fff
+```
+
+### Component Interaction
+
+```mermaid
+graph LR
+    subgraph "Configuration"
+        Config[config.py<br/>Environment Variables]
+    end
+    
+    subgraph "Core RAG"
+        Pipeline[pipeline.py<br/>Orchestration]
+        Retriever[retriever.py<br/>Search]
+        Generator[generator.py<br/>LLM]
+        Ingestion[ingestion.py<br/>Processing]
+    end
+    
+    subgraph "Utilities"
+        WebSearch[web_search.py<br/>External Search]
+        Helpers[helpers.py<br/>Utilities]
+    end
+    
+    Config --> Pipeline
+    Config --> Retriever
+    Config --> Generator
+    Config --> Ingestion
+    
+    Pipeline --> Retriever
+    Pipeline --> Generator
+    Generator --> WebSearch
+    
+    style Config fill:#607D8B,color:#fff
+    style Pipeline fill:#4CAF50,color:#fff
+    style Retriever fill:#2196F3,color:#fff
+    style Generator fill:#FF5722,color:#fff
+    style Ingestion fill:#9C27B0,color:#fff
 ```
 
 ---
@@ -256,55 +352,98 @@ def rag_pipeline(query):
 
 ### Complete Request Flow
 
+```mermaid
+flowchart TD
+    Start([User Submits Query]) --> Input[Query Input]
+    Input --> Validate{Valid Query?}
+    Validate -->|No| Error1[Return Error]
+    Validate -->|Yes| RAG[RAG Pipeline Entry]
+    
+    RAG --> Retrieve[Retrieval Phase]
+    Retrieve --> LoadDB[Load FAISS Index]
+    LoadDB --> Embed[Embed Query]
+    Embed --> Search[Similarity Search]
+    Search --> TopK[Get Top-5 Chunks]
+    
+    TopK --> Generate[Generation Phase]
+    Generate --> BuildContext[Build Context from Chunks]
+    BuildContext --> CreatePrompt[Create LLM Prompt]
+    CreatePrompt --> CallLLM[Call Groq API]
+    CallLLM --> Response[Receive Response]
+    
+    Response --> Check{Answer<br/>Found?}
+    Check -->|Yes| Return[Return Answer]
+    Check -->|No| WebSearch[Perform Web Search]
+    WebSearch --> WebResults{Results<br/>Found?}
+    WebResults -->|Yes| EnhancePrompt[Enhance Prompt with Web Data]
+    WebResults -->|No| NoAnswer[Return 'No Answer Found']
+    EnhancePrompt --> CallLLM2[Call Groq API Again]
+    CallLLM2 --> FinalAnswer[Return Enhanced Answer]
+    
+    Return --> Display[Display to User]
+    FinalAnswer --> Display
+    NoAnswer --> Display
+    Error1 --> Display
+    Display --> End([End])
+    
+    style Start fill:#4CAF50,color:#fff
+    style End fill:#F44336,color:#fff
+    style RAG fill:#2196F3,color:#fff
+    style Generate fill:#FF9800,color:#fff
+    style WebSearch fill:#9C27B0,color:#fff
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    COMPLETE DATA FLOW                           │
-└─────────────────────────────────────────────────────────────────┘
 
-1. USER INPUT
-   │
-   ├─ Web: Streamlit chat input
-   └─ CLI: Terminal input
-   │
-   ▼
+### Retrieval Process
 
-2. RAG PIPELINE ENTRY
-   │
-   ├─ Validate input
-   └─ Pass to retriever
-   │
-   ▼
+```mermaid
+graph TD
+    A[User Query] --> B[Query Preprocessing]
+    B --> C[Generate Query Embedding<br/>MockEmbeddings]
+    C --> D[Load FAISS Index]
+    D --> E[Cosine Similarity Search]
+    E --> F{Results<br/>Found?}
+    F -->|Yes| G[Sort by Relevance Score]
+    F -->|No| H[Relaxed Search<br/>Increase K]
+    H --> G
+    G --> I[Return Top-K Documents]
+    I --> J[Document Chunks with Metadata]
+    
+    style A fill:#4CAF50,color:#fff
+    style C fill:#2196F3,color:#fff
+    style E fill:#FF9800,color:#fff
+    style J fill:#9C27B0,color:#fff
+```
 
-3. RETRIEVAL PHASE
-   │
-   ├─ Load FAISS index
-   ├─ Embed query (MockEmbeddings)
-   ├─ Similarity search (cosine)
-   └─ Get top-3 chunks
-   │
-   ▼
+### Generation Process with Web Search
 
-4. GENERATION PHASE
-   │
-   ├─ Combine chunks into context
-   ├─ Build prompt template
-   ├─ Call Groq API
-   │   ├─ Model: llama-3.3-70b-versatile
-   │   ├─ Temperature: default
-   │   └─ Max tokens: default
-   ├─ Receive response
-   └─ Extract answer
-   │
-   ▼
-
-5. RESPONSE DELIVERY
-   │
-   ├─ Web: Display in chat
-   └─ CLI: Print to terminal
-   │
-   ▼
-
-6. USER SEES ANSWER
+```mermaid
+stateDiagram-v2
+    [*] --> CheckDocuments
+    CheckDocuments --> GenerateFromDocs: Documents Available
+    CheckDocuments --> WebSearch: No Documents
+    
+    GenerateFromDocs --> EvaluateAnswer
+    EvaluateAnswer --> ReturnAnswer: Answer Found
+    EvaluateAnswer --> WebSearch: Answer Insufficient
+    
+    WebSearch --> SearchDuckDuckGo
+    SearchDuckDuckGo --> ParseResults
+    ParseResults --> CombineContext
+    CombineContext --> GenerateEnhanced
+    GenerateEnhanced --> ReturnEnhancedAnswer
+    
+    ReturnAnswer --> [*]
+    ReturnEnhancedAnswer --> [*]
+    
+    note right of WebSearch
+        Fallback mechanism when
+        documents don't contain answer
+    end note
+    
+    note right of GenerateEnhanced
+        Combines document context
+        with web search results
+    end note
 ```
 
 ---
@@ -496,34 +635,107 @@ RAG-AIML/
 
 ### Production Deployment
 
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        Users[Users/Browsers]
+    end
+    
+    subgraph "CDN & Security"
+        CDN[Streamlit Cloud CDN<br/>HTTPS/SSL]
+    end
+    
+    subgraph "Application Layer"
+        App[Streamlit App<br/>app_web.py]
+        Config[Configuration<br/>.env secrets]
+    end
+    
+    subgraph "RAG Components"
+        Pipeline[RAG Pipeline]
+        Retriever[Retriever]
+        Generator[Generator]
+    end
+    
+    subgraph "Data Storage"
+        VectorDB[(FAISS Vector DB<br/>index.faiss)]
+        Docs[(Documents<br/>data/raw/)]
+    end
+    
+    subgraph "External APIs"
+        Groq[Groq API<br/>Llama 3.3 70B]
+        WebAPI[Web Search API<br/>DuckDuckGo/Google]
+    end
+    
+    Users --> CDN
+    CDN --> App
+    App --> Config
+    App --> Pipeline
+    Pipeline --> Retriever
+    Pipeline --> Generator
+    Retriever --> VectorDB
+    Generator --> Groq
+    Generator --> WebAPI
+    VectorDB -.->|Ingestion| Docs
+    
+    style Users fill:#4CAF50,color:#fff
+    style CDN fill:#2196F3,color:#fff
+    style App fill:#FF9800,color:#fff
+    style Groq fill:#9C27B0,color:#fff
+    style WebAPI fill:#9C27B0,color:#fff
+    style VectorDB fill:#607D8B,color:#fff
 ```
-┌─────────────────────────────────────────────────┐
-│         PRODUCTION ARCHITECTURE                 │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│  ┌─────────────┐                               │
-│  │   USERS     │                               │
-│  └──────┬──────┘                               │
-│         │                                       │
-│         ▼                                       │
-│  ┌─────────────┐                               │
-│  │  CDN/HTTPS  │                               │
-│  └──────┬──────┘                               │
-│         │                                       │
-│         ▼                                       │
-│  ┌─────────────────────┐                       │
-│  │  Streamlit Cloud    │                       │
-│  │  or Render/Railway  │                       │
-│  └──────┬──────────────┘                       │
-│         │                                       │
-│         ├─────────────┬──────────────┐         │
-│         ▼             ▼              ▼         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐    │
-│  │   App    │  │ Vector   │  │  Groq    │    │
-│  │ Container│  │   DB     │  │   API    │    │
-│  └──────────┘  └──────────┘  └──────────┘    │
-│                                                 │
-└─────────────────────────────────────────────────┘
+
+### Deployment Options
+
+```mermaid
+mindmap
+  root((Deployment<br/>Options))
+    Streamlit Cloud
+      Free Tier
+      Auto Deploy
+      SSL Included
+      Community Support
+    Render
+      Free Tier
+      Auto Sleep
+      Custom Domain
+      GitHub Integration
+    Hugging Face Spaces
+      Free Hosting
+      ML Community
+      Easy Sharing
+      No Sleep
+    Railway
+      Paid 5/month
+      Always Running
+      Fast Deploy
+      Good Performance
+    Docker VPS
+      Full Control
+      Self Hosted
+      Custom Config
+      Manual Setup
+```
+
+### CI/CD Pipeline
+
+```mermaid
+gitGraph
+    commit id: "Initial Setup"
+    commit id: "Add RAG Core"
+    branch development
+    checkout development
+    commit id: "Feature: Web Search"
+    commit id: "Feature: Better UI"
+    checkout main
+    merge development tag: "v1.0"
+    commit id: "Deploy to Streamlit"
+    branch hotfix
+    checkout hotfix
+    commit id: "Fix: Dependencies"
+    checkout main
+    merge hotfix tag: "v1.0.1"
+    commit id: "Auto Deploy"
 ```
 
 ---

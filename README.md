@@ -11,9 +11,11 @@ A production-ready Retrieval-Augmented Generation (RAG) system using LangChain, 
 - Document ingestion and intelligent chunking
 - Vector-based semantic search with FAISS
 - AI-powered answers using Groq's Llama 3.3 70B
+- **Web search integration** - Falls back to DuckDuckGo/Google when answer not in documents
 - Interactive web interface (Streamlit)
 - Production-ready with Docker support
 - Completely free to use
+- Mermaid architecture diagrams for clear visualization
 
 ## Quick Start
 
@@ -56,12 +58,22 @@ Open: http://localhost:8501
 
 ## Architecture Overview
 
-```
-User Query → Retriever (FAISS) → Generator (Groq LLM) → Answer
-                ↑
-         Vector Database
-                ↑
-         Document Ingestion
+```mermaid
+graph LR
+    A[User Query] --> B[Retriever]
+    B --> C[FAISS Vector DB]
+    C --> D[Generator]
+    D --> E{Answer Found?}
+    E -->|Yes| F[Return Answer]
+    E -->|No| G[Web Search]
+    G --> H[DuckDuckGo/Google]
+    H --> D
+    D --> F
+    
+    style A fill:#4CAF50,color:#fff
+    style D fill:#2196F3,color:#fff
+    style G fill:#FF9800,color:#fff
+    style F fill:#9C27B0,color:#fff
 ```
 
 For detailed architecture diagrams and flow, see [ARCHITECTURE.md](ARCHITECTURE.md)
@@ -128,9 +140,10 @@ print(answer)  # Output: Guido van Rossum
 ## How It Works
 
 1. **Ingestion**: Documents are loaded, split into chunks, and stored in FAISS vector database
-2. **Retrieval**: User query is embedded and similar chunks are retrieved
+2. **Retrieval**: User query is embedded and similar chunks are retrieved (top-5)
 3. **Generation**: Retrieved context + query is sent to Groq LLM
-4. **Response**: AI generates answer based only on document context
+4. **Web Search Fallback**: If answer not found in documents, automatically searches web (DuckDuckGo/Google)
+5. **Response**: AI generates answer from documents or web search results with source citations
 
 ## Contributing
 

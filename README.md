@@ -2,6 +2,10 @@
 
 A production-ready Retrieval-Augmented Generation (RAG) system using LangChain, FAISS, and Groq's free API.
 
+[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
+
 ## ✨ Features
 
 - 📚 Document ingestion and intelligent chunking
@@ -47,8 +51,8 @@ Open: http://localhost:8501
 
 ## 📖 Documentation
 
+- **[Quick Start Guide](QUICKSTART.md)** - 5-minute setup guide
 - **[Architecture Guide](ARCHITECTURE.md)** - Complete system architecture, diagrams, and technical details
-- **[API Documentation](#api-configuration)** - Groq API integration details
 
 ## 🏗️ Architecture Overview
 
@@ -65,7 +69,7 @@ For detailed architecture diagrams and flow, see [ARCHITECTURE.md](ARCHITECTURE.
 ## 🌐 Deployment
 
 ### Streamlit Cloud (Recommended - FREE)
-1. Push to GitHub
+1. Push to GitHub ✅
 2. Go to https://share.streamlit.io/
 3. Connect repository
 4. Add secret: `OPENAI_API_KEY`
@@ -121,6 +125,13 @@ answer = rag_pipeline("Who created Python?")
 print(answer)  # Output: Guido van Rossum
 ```
 
+## 🎯 How It Works
+
+1. **Ingestion**: Documents are loaded, split into chunks, and stored in FAISS vector database
+2. **Retrieval**: User query is embedded and similar chunks are retrieved
+3. **Generation**: Retrieved context + query is sent to Groq LLM
+4. **Response**: AI generates answer based only on document context
+
 ## 🤝 Contributing
 
 Contributions welcome! Please open an issue or submit a PR.
@@ -132,6 +143,7 @@ MIT License
 ## 👨‍💻 Author
 
 Adarsh Priydarshi
+- GitHub: [@adarsh-priydarshi-5646](https://github.com/adarsh-priydarshi-5646)
 
 ---
 

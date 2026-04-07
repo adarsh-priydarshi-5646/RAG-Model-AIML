@@ -1,13 +1,29 @@
 from openai import OpenAI
 from app.config import OPENAI_API_KEY
+import os
 
-def generate_answer(query, docs):
+def search_web(query):
+    """
+    Search web for additional information if needed
+    Returns search results as string
+    """
+    try:
+        # Check if we have web search capability
+        # For now, return None - can be extended with actual web search API
+        return None
+    except Exception as e:
+        print(f"Web search error: {e}")
+        return None
+
+
+def generate_answer(query, docs, use_web_search=False):
     """
     Generate answer using Groq LLM based on retrieved documents
     
     Args:
         query: User's question
         docs: Retrieved document chunks
+        use_web_search: Whether to use web search if answer not found
     
     Returns:
         Generated answer string
@@ -16,6 +32,8 @@ def generate_answer(query, docs):
 
     # Check if we have documents
     if not docs:
+        if use_web_search:
+            return "I couldn't find any relevant information in the documents. For questions outside the document scope, please try rephrasing or adding more documents to the knowledge base."
         return "I couldn't find any relevant information in the documents to answer your question. Please try rephrasing your question or check if the documents contain the information you're looking for."
 
     # Combine all document content with clear separation
@@ -70,6 +88,18 @@ ANSWER:"""
         
         # Clean up the answer
         answer = answer.strip()
+        
+        # Check if answer indicates information not found
+        not_found_phrases = [
+            "don't have enough information",
+            "not in the documents",
+            "cannot find",
+            "not mentioned in the context"
+        ]
+        
+        if use_web_search and any(phrase in answer.lower() for phrase in not_found_phrases):
+            # Add note about web search capability
+            answer += "\n\nNote: This answer is based only on the provided documents. For broader information, consider adding more relevant documents to the knowledge base."
         
         return answer
         

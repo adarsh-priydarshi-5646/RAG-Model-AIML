@@ -3,6 +3,6 @@ langchain-community==0.4.1
 langchain-text-splitters==1.1.1
 openai==2.30.0
 faiss-cpu==1.13.2
-numpy==2.2.6
+numpy<2.0.0,>=1.19.3
 python-dotenv==1.0.0
-streamlit==1.32.0
+streamlit>=1.32.0

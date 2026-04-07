@@ -1,0 +1,12 @@
+Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the use of significant indentation. Python is dynamically typed and garbage-collected, supporting multiple programming paradigms including structured, object-oriented, and functional programming.
+
+Python was created by Guido van Rossum and first released in 1991. The name Python was inspired by the British comedy series Monty Python. Python prioritizes simplicity and readability, following the principle that "there should be one—and preferably only one—obvious way to do it."
+
+Key features of Python include:
+- Simple and easy-to-learn syntax
+- Extensive standard library
+- Strong community support
+- Cross-platform compatibility
+- Versatility for multiple domains (web, AI/ML, data science, automation)
+
+Popular frameworks and libraries include Django and Flask for web development, NumPy and Pandas for data analysis, TensorFlow and PyTorch for machine learning, and many others.

@@ -1,5 +1,18 @@
 # Deployment Guide - Streamlit Cloud
 
+## Recent Fix (April 2026)
+
+**Issue Resolved**: Python 3.14 dependency conflicts with numpy and langchain
+**Solution**: Removed langchain dependencies, implemented native FAISS integration
+**Status**: Deployment now works on Streamlit Cloud with Python 3.11
+
+### What Changed
+- Removed `langchain-community` and `langchain-text-splitters`
+- Implemented custom Document class and text splitting
+- Direct FAISS integration without wrappers
+- Added `.python-version` file to force Python 3.11
+- All RAG functionality maintained (retrieval, generation, web search)
+
 ## Quick Deployment Steps
 
 ### 1. Prerequisites
@@ -32,10 +45,13 @@
 
 ## Troubleshooting
 
-### Issue: Dependency conflicts
-**Solution**: The requirements.txt is configured for compatibility. If issues persist:
-- Check that numpy version is `<2.0.0,>=1.19.3`
-- Streamlit Cloud uses Python 3.10+ by default
+### Issue: Dependency conflicts (FIXED)
+**Previous Issue**: Python 3.14 had numpy version conflicts between streamlit and langchain
+**Solution Applied**: 
+- Removed langchain dependencies
+- Using Python 3.11 via `.python-version` file
+- Native FAISS integration
+- Should deploy successfully now
 
 ### Issue: Vector database not found
 **Solution**: The app will show a warning. To fix:
